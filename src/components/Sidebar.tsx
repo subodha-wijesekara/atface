@@ -48,11 +48,11 @@ export default function Sidebar() {
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 space-y-2">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 px-2">Menu</p>
+                    <nav className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">Menu</p>
                         {navLinks.map((link) => {
                             const Icon = link.icon;
-                            const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+                            const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href) && link.href !== '/admin'); // Fix overlapping active state for /admin subroutes if handled separately
                             return (
                                 <Link
                                     key={link.href}
@@ -71,6 +71,8 @@ export default function Sidebar() {
                                 </Link>
                             );
                         })}
+
+                        {/* Admin Section Removed */}
                     </nav>
 
                     {/* Footer / User Controls */}
