@@ -1,0 +1,102 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { LayoutDashboard, Users, UserPlus, ClipboardCheck, Settings, BarChart3, Menu, X, LogOut } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { useState } from 'react';
+
+export default function Sidebar() {
+    const pathname = usePathname();
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+    const navLinks = [
+        { href: '/', label: 'Home', icon: LayoutDashboard },
+        { href: '/rooms', label: 'My Classes', icon: Users },
+        { href: '/register', label: 'Global Register', icon: UserPlus }, // Maybe hide this later?
+        { href: '/attendance', label: 'Quick Scan', icon: ClipboardCheck },
+        { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+        { href: '/maintenance', label: 'Maintenance', icon: Settings },
+    ];
+
+    return (
+        <>
+            {/* Mobile Menu Button */}
+            <button
+                onClick={() => setIsMobileOpen(!isMobileOpen)}
+                className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-card/80 backdrop-blur border border-white/10 rounded-xl"
+            >
+                {isMobileOpen ? <X /> : <Menu />}
+            </button>
+
+            {/* Sidebar Container */}
+            <aside className={cn(
+                "fixed inset-y-0 left-0 z-40 w-64 bg-card/60 backdrop-blur-xl border-r border-white/10 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static",
+                isMobileOpen ? "translate-x-0" : "-translate-x-full"
+            )}>
+                <div className="flex flex-col h-full p-6">
+                    {/* Brand */}
+                    <div className="flex items-center gap-3 mb-10 px-2">
+                        <span className="text-2xl font-bold tracking-tighter text-foreground">
+                            atface
+                        </span>
+                    </div>
+
+                    {/* Navigation */}
+                    <nav className="flex-1 space-y-2">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-4 px-2">Menu</p>
+                        {navLinks.map((link) => {
+                            const Icon = link.icon;
+                            const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    onClick={() => setIsMobileOpen(false)}
+                                    className={cn(
+                                        "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
+                                        isActive
+                                            ? "bg-blue-600/10 text-blue-500 font-medium border border-blue-500/20"
+                                            : "hover:bg-secondary/50 text-muted-foreground hover:text-foreground hover:translate-x-1"
+                                    )}
+                                >
+                                    <Icon className={cn("w-5 h-5 transition-colors", isActive ? "text-blue-500" : "text-muted-foreground group-hover:text-foreground")} />
+                                    <span>{link.label}</span>
+                                    {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
+                                </Link>
+                            );
+                        })}
+                    </nav>
+
+                    {/* Footer / User Controls */}
+                    <div className="mt-auto pt-6 border-t border-white/5 space-y-4">
+                        <div className="flex items-center justify-between px-2">
+                            <p className="text-xs text-muted-foreground">Theme</p>
+                            <ThemeToggle />
+                        </div>
+
+                        {/* Placeholder User (can be dynamic later) */}
+                        <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-white/5">
+                            <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold">
+                                JD
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">John Doe</p>
+                                <p className="text-xs text-muted-foreground truncate">Admin</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            {/* Mobile Overlay */}
+            {isMobileOpen && (
+                <div
+                    onClick={() => setIsMobileOpen(false)}
+                    className="fixed inset-0 z-30 bg-black/80 backdrop-blur-sm lg:hidden"
+                />
+            )}
+        </>
+    );
+}
