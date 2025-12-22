@@ -33,7 +33,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           <ThemeProvider
-            attribute="data-theme"
+            attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange

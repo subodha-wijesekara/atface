@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-border: var(--border);
   --color-input: var(--input);
@@ -27,7 +29,7 @@
 
 :root {
   /* Apple Light Mode */
-  --background: #ffffff;
+  --background: #f9fafb; /* gray-50 */
   --foreground: #1d1d1f;
 
   --card: #ffffff;
@@ -61,13 +63,13 @@
   /* Smoother 20px corners */
 }
 
-[data-theme="dark"] {
+.dark {
   /* Apple Dark Mode */
-  --background: #000000;
+  --background: #09090b; /* zinc-950 */
   /* Pure Black OLED */
   --foreground: #f5f5f7;
 
-  --card: #1c1c1e;
+  --card: #18181b; /* zinc-900 */
   /* Apple Dark Gray */
   --card-foreground: #f5f5f7;
 
@@ -106,11 +108,12 @@ body {
   background-attachment: fixed;
 }
 
-[data-theme="dark"] body {
+.dark body {
   background-image: radial-gradient(rgba(255, 255, 255, 0.1) 0.5px, transparent 0.5px);
 }
 
-[data-theme="light"] body {
+/* Light mode background pattern */
+body {
   background-image: radial-gradient(rgba(0, 0, 0, 0.05) 0.5px, transparent 0.5px);
 }
 
@@ -122,7 +125,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-[data-theme="dark"] .glass {
+.dark .glass {
   background: rgba(28, 28, 30, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
