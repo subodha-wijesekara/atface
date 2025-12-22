@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 import Sidebar from "@/components/Sidebar";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import AuthProvider from "@/components/SessionProvider";
 
 export default function RootLayout({
   children,
@@ -30,20 +31,22 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground h-screen overflow-hidden`}
       >
-        <ThemeProvider
-          attribute="data-theme"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="flex h-full w-full">
-            <Sidebar />
-            <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative scroll-smooth p-6 lg:p-10">
-              {/* Add a subtle top fade/gradient if needed for aesthetic, or keep clean */}
-              {children}
-            </main>
-          </div>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider
+            attribute="data-theme"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="flex h-full w-full">
+              <Sidebar />
+              <main className="flex-1 h-full overflow-y-auto overflow-x-hidden relative scroll-smooth p-6 lg:p-10">
+                {/* Add a subtle top fade/gradient if needed for aesthetic, or keep clean */}
+                {children}
+              </main>
+            </div>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

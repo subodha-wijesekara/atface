@@ -7,9 +7,13 @@ import { LayoutDashboard, Users, UserPlus, ClipboardCheck, Settings, BarChart3, 
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useState } from 'react';
 
+import { useSession, signOut } from "next-auth/react";
+
 export default function Sidebar() {
     const pathname = usePathname();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+    const { data: session } = useSession();
 
     const navLinks = [
         { href: '/', label: 'Home', icon: LayoutDashboard },
@@ -76,16 +80,28 @@ export default function Sidebar() {
                             <ThemeToggle />
                         </div>
 
-                        {/* Placeholder User (can be dynamic later) */}
-                        <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-white/5">
-                            <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold">
-                                JD
+                        {session?.user ? (
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-white/5 relative group">
+                                <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold uppercase">
+                                    {session.user.name?.[0] || 'U'}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium truncate">{session.user.name || 'User'}</p>
+                                    <p className="text-xs text-muted-foreground truncate capitalize">{(session.user as any).role || 'Member'}</p>
+                                </div>
+                                <button
+                                    onClick={() => signOut({ callbackUrl: '/login' })}
+                                    className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-white/10 rounded-lg text-muted-foreground hover:text-red-400"
+                                    title="Sign Out"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                </button>
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">John Doe</p>
-                                <p className="text-xs text-muted-foreground truncate">Admin</p>
+                        ) : (
+                            <div className="p-3">
+                                <div className="w-full h-10 bg-white/5 rounded-xl animate-pulse"></div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </aside>
