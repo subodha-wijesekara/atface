@@ -41,57 +41,57 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground p-4">
-            {/* Background Ambience */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 dark:bg-background text-foreground p-4 transition-colors duration-300">
+            {/* Background Ambience - Dark Mode Only */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden hidden dark:block">
                 <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/10 blur-[120px]" />
                 <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/10 blur-[120px]" />
             </div>
 
             <div className="relative z-10 w-full max-w-md">
                 <div className="text-center mb-8 space-y-2">
-                    <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/25 mb-4">
+                    <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-blue-600 shadow-xl shadow-blue-500/30 mb-4">
                         <ShieldCheck className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-3xl font-bold tracking-tight">Welcome Back</h1>
-                    <p className="text-muted-foreground">Sign in to access the dashboard</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Welcome Back</h1>
+                    <p className="text-gray-600 dark:text-gray-400 font-medium">Sign in to access the dashboard</p>
                 </div>
 
-                <div className="rounded-[2rem] border border-border/50 dark:border-white/10 bg-card/60 dark:bg-black/40 backdrop-blur-xl shadow-2xl p-8">
+                <div className="rounded-[2rem] border border-gray-200 dark:border-white/10 bg-white dark:bg-black/40 dark:backdrop-blur-xl shadow-xl p-8 transition-all duration-300">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {error && (
-                            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium text-center">
+                            <div className="p-3 rounded-xl bg-red-50 text-red-600 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 dark:text-red-500 text-sm font-bold text-center">
                                 {error}
                             </div>
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold ml-1 text-foreground/80">Username</label>
+                            <label className="text-sm font-bold ml-1 text-gray-900 dark:text-gray-300">Username</label>
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="flex h-12 w-full rounded-xl border border-input dark:border-white/10 bg-secondary/30 dark:bg-white/5 px-4 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-all placeholder:text-muted-foreground/50 text-foreground"
+                                className="flex h-12 w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-4 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white font-medium"
                                 placeholder="Enter your username"
                                 required
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold ml-1 text-foreground/80">Password</label>
+                            <label className="text-sm font-bold ml-1 text-gray-900 dark:text-gray-300">Password</label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="flex h-12 w-full rounded-xl border border-input dark:border-white/10 bg-secondary/30 dark:bg-white/5 px-4 pr-12 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-all placeholder:text-muted-foreground/50 text-foreground"
+                                    className="flex h-12 w-full rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 px-4 pr-12 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:focus-visible:ring-blue-500 focus-visible:ring-offset-0 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white font-medium"
                                     placeholder="••••••••"
                                     required
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-1"
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
@@ -106,16 +106,16 @@ export default function LoginPage() {
                             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
                         </button>
 
-                        <div className="pt-2 text-center text-sm text-muted-foreground">
+                        <div className="pt-2 text-center text-sm text-gray-600 dark:text-gray-400 font-medium">
                             Don&apos;t have an account?{" "}
-                            <Link href="/signup" className="text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors">
+                            <Link href="/signup" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-bold transition-colors">
                                 Sign up
                             </Link>
                         </div>
                     </form>
                 </div>
 
-                <p className="mt-8 text-center text-xs text-muted-foreground/50">
+                <p className="mt-8 text-center text-xs text-gray-400 dark:text-gray-500 font-medium">
                     Secure Access • Admin Protected
                 </p>
             </div>
