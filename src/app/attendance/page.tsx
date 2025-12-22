@@ -205,6 +205,26 @@ export default function Attendance() {
         return () => clearInterval(interval);
     }, [modelsLoaded, students]);
 
+    const speakConfirmation = (text: string) => {
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            // Try to find a female voice
+            const femaleVoice = voices.find(voice =>
+                voice.name.includes('Female') ||
+                voice.name.includes('Zira') ||
+                voice.name.includes('Google US English')
+            );
+            if (femaleVoice) {
+                utterance.voice = femaleVoice;
+            }
+            // Slightly higher pitch for female-leaning tone if specific voice not found (fallback)
+            utterance.pitch = 1.1;
+            utterance.rate = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+    };
+
     const markAttendance = async (name: string) => {
         try {
             const res = await fetch('/api/attendance', {
@@ -213,6 +233,7 @@ export default function Attendance() {
                 body: JSON.stringify({ studentId: name, name }),
             });
             if (res.ok) {
+                speakConfirmation(`Welcome ${name}`);
                 loadLogs();
             }
         } catch (error) {

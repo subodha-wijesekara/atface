@@ -199,6 +199,24 @@ export default function RoomAttendance({ params }: { params: Promise<{ id: strin
         return () => clearInterval(interval);
     }, [modelsLoaded, students]);
 
+    const speakConfirmation = (text: string) => {
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            const voices = window.speechSynthesis.getVoices();
+            const femaleVoice = voices.find(voice =>
+                voice.name.includes('Female') ||
+                voice.name.includes('Zira') ||
+                voice.name.includes('Google US English')
+            );
+            if (femaleVoice) {
+                utterance.voice = femaleVoice;
+            }
+            utterance.pitch = 1.1;
+            utterance.rate = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+    };
+
     const markAttendance = async (name: string) => {
         try {
             // Find student ID
@@ -217,6 +235,7 @@ export default function RoomAttendance({ params }: { params: Promise<{ id: strin
                 }),
             });
             if (res.ok) {
+                speakConfirmation(`Welcome ${name}`);
                 loadLogs();
             }
         } catch (error) {
