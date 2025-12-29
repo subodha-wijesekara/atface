@@ -20,7 +20,7 @@ interface Room {
     name: string;
 }
 
-export default function RoomStudents({ params }: { params: Promise<{ id: string }> }) {
+export default function MaintenanceStudentList({ params }: { params: Promise<{ id: string }> }) {
     const { id: roomId } = use(params);
     const [students, setStudents] = useState<Student[]>([]);
     const [allRooms, setAllRooms] = useState<Room[]>([]);
@@ -89,15 +89,15 @@ export default function RoomStudents({ params }: { params: Promise<{ id: string 
 
     return (
         <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 font-sans min-h-screen">
-            <Link href={`/rooms/${roomId}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
+            <Link href="/maintenance" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-8 transition-colors">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to {roomName || 'Room'}
+                Back to Maintenance
             </Link>
 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight mb-2">My Students</h1>
-                    <p className="text-muted-foreground">Manage and view students registered to {roomName || 'this class'}.</p>
+                    <h1 className="text-3xl font-bold tracking-tight mb-2">Maintenance - {roomName || 'Class'}</h1>
+                    <p className="text-muted-foreground">Manage students registered to this class.</p>
                 </div>
                 <div className="relative w-full md:w-64">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -186,7 +186,7 @@ export default function RoomStudents({ params }: { params: Promise<{ id: string 
                 </div>
             )}
 
-            {/* Edit Modal (Placeholder - needs backend impl) */}
+            {/* Edit Modal */}
             {showEditModal && selectedStudent && (
                 <EditStudentModal
                     student={selectedStudent}
@@ -195,7 +195,7 @@ export default function RoomStudents({ params }: { params: Promise<{ id: string 
                 />
             )}
 
-            {/* Enroll Modal (Placeholder - needs backend impl) */}
+            {/* Enroll Modal */}
             {showEnrollModal && selectedStudent && (
                 <EnrollStudentModal
                     student={selectedStudent}

@@ -22,14 +22,16 @@ export async function POST(request: Request) {
             timestamp: { $gte: startOfDay }
         });
 
-        const status = existingRecord ? 're-entry' : 'present';
+        if (existingRecord) {
+            return NextResponse.json({ error: 'Student already marked present in this class today' }, { status: 409 });
+        }
 
         const newRecord = await Attendance.create({
             studentId,
             name,
             roomId,
             timestamp: timestamp || new Date(),
-            status
+            status: 'present'
         });
 
         return NextResponse.json({ success: true, record: newRecord });

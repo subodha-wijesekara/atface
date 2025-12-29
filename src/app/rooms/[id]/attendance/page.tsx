@@ -6,15 +6,17 @@ import { useRouter } from 'next/navigation';
 import * as faceapi from 'face-api.js';
 import { cn } from '@/lib/utils';
 import { checkSmile } from '@/lib/liveness';
-import { Activity, Users, ArrowLeft, Clock, Zap, CheckCircle2, Loader2, Smile, RefreshCw } from 'lucide-react';
+import { Activity, Users, ArrowLeft, Clock, Zap, CheckCircle2, Loader2, Smile, RefreshCw, Trash2 } from 'lucide-react';
 
 interface Student {
     name: string;
     descriptors: number[][];
     roomIds?: string[];
+    profileImage?: string;
 }
 
 interface AttendanceLog {
+    _id: string;
     name: string;
     timestamp: string;
 }
@@ -56,18 +58,6 @@ export default function RoomAttendance({ params }: { params: Promise<{ id: strin
                 setModelsLoaded(true);
 
                 // Fetch Students FILTERED by Room
-                // We'll need to assume the API supports this or filter client-side for now
-                // Ideally backend should filter, but let's see. 
-                // For now, I'll fetch all and filter client side if API doesn't support, 
-                // BUT I should check if I added roomId support to GET /api/students.
-                // I haven't added GET filter support explicitly in the plan step 309/314.
-                // Let's implement client-side filtering safely or update the backend.
-                // Actually, Step 309/316 was only POST. 
-                // I should update GET /api/students to support filtering? 
-                // Wait, typically I'd do `fetch('/api/students?roomId=' + roomId)`.
-                // Let's assume I'll add that backend logic or just filter here.
-                // Filter here is safer for immediate implementation without context switch.
-
                 const response = await fetch('/api/students');
                 if (response.ok) {
                     const data: Student[] = await response.json();
@@ -90,16 +80,16 @@ export default function RoomAttendance({ params }: { params: Promise<{ id: strin
         loadResources();
         loadLogs();
 
-        // Polling logs specifically for this room (or filter on client)
-        // I need to update GET attendance to filter by room too?
-        // Usage: `fetchLogs`
     }, [roomId]);
 
     const loadLogs = async () => {
         if (!roomId) return;
         try {
-            // Fetch attendance logs specific to this room
-            const res = await fetch(`/api/attendance?roomId=${roomId}`);
+            // Fetch attendance logs specific to this room for TODAY only
+            const startOfDay = new Date();
+            startOfDay.setHours(0, 0, 0, 0);
+
+            const res = await fetch(`/api/attendance?roomId=${roomId}&from=${startOfDay.toISOString()}`);
             if (res.ok) {
                 const data: AttendanceLog[] = await res.json();
                 setLogs(data);
@@ -116,6 +106,27 @@ export default function RoomAttendance({ params }: { params: Promise<{ id: strin
                 livenessState.current[rejoinCandidate].verified = false;
             }
             setRejoinCandidate(null);
+        }
+    };
+
+    const handleDeleteLog = async (logId: string, event: React.MouseEvent) => {
+        event.stopPropagation(); // Prevent potentially triggering other click events if any
+        if (!confirm("Are you sure you want to delete this record?")) return;
+
+        try {
+            const res = await fetch(`/api/attendance/${logId}`, {
+                method: 'DELETE'
+            });
+
+            if (res.ok) {
+                // Optimistic update
+                setLogs(prev => prev.filter(log => log._id !== logId));
+            } else {
+                alert("Failed to delete record");
+            }
+        } catch (error) {
+            console.error("Error deleting log:", error);
+            alert("Error deleting record");
         }
     };
 
@@ -156,7 +167,7 @@ export default function RoomAttendance({ params }: { params: Promise<{ id: strin
                             const name = bestMatch.label;
                             const now = Date.now();
                             const lastTime = lastMarkedRef.current[name] || 0;
-                            // COOLDOWN: 1 minute for testing re-entry. Was 30 minutes.
+                            // COOLDOWN: 1 minute for testing re-entry
                             const COOLDOWN = 1 * 60 * 1000;
                             const inCooldown = (now - lastTime) < COOLDOWN;
 
@@ -221,9 +232,6 @@ export default function RoomAttendance({ params }: { params: Promise<{ id: strin
         try {
             // Find student ID
             const student = students.find(s => s.name === name);
-            // We use name as studentId usually in this app logic based on previous files, 
-            // but ideally we should use _id. Previous implementation used name as ID in some places 
-            // but let's stick to name for consistency with existing `attendance/page.tsx`.
 
             const res = await fetch('/api/attendance', {
                 method: 'POST',
@@ -326,42 +334,58 @@ export default function RoomAttendance({ params }: { params: Promise<{ id: strin
                             </div>
                         ) : (
                             <div className="space-y-1 p-2">
-                                {logs.map((log, i) => (
-                                    <div key={i} className={cn(
-                                        "group flex items-center gap-4 p-3 rounded-xl border border-transparent transition-all duration-300 animate-in fade-in slide-in-from-right-4",
-                                        rejoinCandidate === log.name
-                                            ? "bg-blue-500/10 border-blue-500/40"
-                                            : "hover:bg-white/5 dark:hover:bg-white/5 hover:border-white/10"
-                                    )}>
-                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-bold text-white shadow-md">
-                                            {log.name.charAt(0)}
-                                        </div>
-                                        <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                                            <p className="text-sm font-bold leading-none truncate text-foreground">{log.name}</p>
-                                            <p className="text-xs font-medium text-muted-foreground">
-                                                Marked at {new Date(log.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                            </p>
-                                        </div>
-                                        {rejoinCandidate === log.name ? (
-                                            <button
-                                                onClick={handleRejoin}
-                                                className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
-                                            >
-                                                <RefreshCw className="w-3.5 h-3.5 animate-spin-slow" />
-                                                Re-join
-                                            </button>
-                                        ) : (
-                                            <div className="ml-auto">
-                                                <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                {logs.map((log) => {
+                                    const student = students.find(s => s.name === log.name);
+                                    return (
+                                        <div key={log._id} className={cn(
+                                            "group flex items-center gap-4 p-3 rounded-xl border border-transparent transition-all duration-300 animate-in fade-in slide-in-from-right-4 relative",
+                                            rejoinCandidate === log.name
+                                                ? "bg-blue-500/10 border-blue-500/40"
+                                                : "hover:bg-white/5 dark:hover:bg-white/5 hover:border-white/10"
+                                        )}>
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-bold text-white shadow-md overflow-hidden">
+                                                {student?.profileImage ? (
+                                                    <img src={student.profileImage} alt={log.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    log.name.charAt(0)
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-                                ))}
+                                            <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                                                <p className="text-sm font-bold leading-none truncate text-foreground">{log.name}</p>
+                                                <p className="text-xs font-medium text-muted-foreground">
+                                                    Marked at {new Date(log.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                {rejoinCandidate === log.name ? (
+                                                    <button
+                                                        onClick={handleRejoin}
+                                                        className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+                                                    >
+                                                        <RefreshCw className="w-3.5 h-3.5 animate-spin-slow" />
+                                                        Re-join
+                                                    </button>
+                                                ) : (
+                                                    <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                                )}
+
+                                                <button
+                                                    onClick={(e) => handleDeleteLog(log._id, e)}
+                                                    className="opacity-0 group-hover:opacity-100 p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                                    title="Delete Record"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

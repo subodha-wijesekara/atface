@@ -1,164 +1,124 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Loader2, Calendar, Users, Clock, Filter } from 'lucide-react';
+import Link from 'next/link';
+import { Loader2, School, Users, ArrowRight, BarChart3, PieChart } from 'lucide-react';
 
-interface AttendanceRecord {
+interface Room {
     _id: string;
     name: string;
-    studentId: string;
-    timestamp: string;
+    description?: string;
+    createdAt: string;
 }
 
-export default function Analytics() {
-    const [records, setRecords] = useState<AttendanceRecord[]>([]);
+export default function AnalyticsHome() {
+    const [rooms, setRooms] = useState<Room[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState<'today' | 'week' | 'month'>('today');
 
     useEffect(() => {
-        fetchRecords();
-    }, [filter]);
+        fetchRooms();
+    }, []);
 
-    const fetchRecords = async () => {
-        setLoading(true);
+    const fetchRooms = async () => {
         try {
-            const now = new Date();
-            let fromDate = new Date(); // default to today start
-
-            if (filter === 'today') {
-                fromDate.setHours(0, 0, 0, 0);
-            } else if (filter === 'week') {
-                fromDate.setDate(now.getDate() - 7);
-            } else if (filter === 'month') {
-                fromDate.setMonth(now.getMonth() - 1);
-            }
-
-            const query = new URLSearchParams({
-                from: fromDate.toISOString(),
-                to: now.toISOString()
-            });
-
-            const response = await fetch(`/api/attendance?${query.toString()}`);
+            const response = await fetch('/api/rooms');
             if (response.ok) {
                 const data = await response.json();
-                setRecords(data);
+                setRooms(data);
             }
         } catch (error) {
-            console.error('Failed to fetch analytics', error);
+            console.error('Failed to fetch rooms', error);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 font-sans">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div className="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8 min-h-screen">
+            <div className="flex justify-between items-center mb-10">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight mb-2">Attendance Analytics</h1>
-                    <p className="text-muted-foreground">View attendance history and statistics.</p>
-                </div>
-
-                <div className="flex bg-secondary/30 p-1 rounded-xl border border-white/5 backdrop-blur-sm">
-                    <button
-                        onClick={() => setFilter('today')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'today' ? 'bg-background text-blue-500 shadow-none border border-border/20' : 'text-muted-foreground hover:text-foreground'}`}
-                    >
-                        Today
-                    </button>
-                    <button
-                        onClick={() => setFilter('week')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'week' ? 'bg-background text-blue-500 shadow-none border border-border/20' : 'text-muted-foreground hover:text-foreground'}`}
-                    >
-                        Last 7 Days
-                    </button>
-                    <button
-                        onClick={() => setFilter('month')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filter === 'month' ? 'bg-background text-blue-500 shadow-none border border-border/20' : 'text-muted-foreground hover:text-foreground'}`}
-                    >
-                        This Month
-                    </button>
+                    <h1 className="text-3xl font-bold tracking-tight mb-2">Analytics</h1>
+                    <p className="text-muted-foreground">Detailed insights for classes and overall performance.</p>
                 </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-card/30 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-none">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500">
-                            <Users className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p className="text-sm text-muted-foreground font-medium">Total Presence</p>
-                            <h3 className="text-2xl font-bold">{records.length}</h3>
-                        </div>
-                    </div>
+            {loading ? (
+                <div className="flex justify-center py-20">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 </div>
-                <div className="bg-card/30 backdrop-blur-xl p-6 rounded-3xl border border-white/10 shadow-none">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-emerald-500/10 rounded-xl text-emerald-500">
-                            <Clock className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p className="text-sm text-muted-foreground font-medium">Period</p>
-                            <h3 className="text-lg font-bold capitalize">
-                                {filter === 'today' ? 'Today' : filter === 'week' ? 'Last 7 Days' : 'Last 30 Days'}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Overall Analytics Card */}
+                    <Link href="/analytics/overall" className="group">
+                        <div className="bg-gradient-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-xl border border-blue-500/20 p-6 rounded-3xl shadow-sm hover:shadow-md transition-all h-full flex flex-col justify-between relative overflow-hidden group-hover:bg-card/60">
+                            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                                <PieChart className="w-24 h-24 transform rotate-12" />
+                            </div>
 
-            {/* Table */}
-            <div className="bg-card/30 backdrop-blur-xl rounded-3xl shadow-none border border-white/10 dark:border-white/5 overflow-hidden ring-1 ring-black/5">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                        <thead className="bg-secondary/30 border-b border-white/5">
-                            <tr>
-                                <th className="px-6 py-4 font-semibold text-muted-foreground">Name</th>
-                                <th className="px-6 py-4 font-semibold text-muted-foreground">Date</th>
-                                <th className="px-6 py-4 font-semibold text-muted-foreground">Time</th>
-                                <th className="px-6 py-4 font-semibold text-muted-foreground text-right">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {loading ? (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
-                                        <div className="flex justify-center items-center gap-2">
-                                            <Loader2 className="h-5 w-5 animate-spin" />
-                                            Loading data...
+                            <div>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-3 bg-blue-500 text-white rounded-2xl shadow-lg shadow-blue-500/20">
+                                        <BarChart3 className="w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-blue-300 font-medium uppercase tracking-wider">Dashboard</p>
+                                        <h3 className="text-xl font-bold leading-tight">Overall Analytics</h3>
+                                    </div>
+                                </div>
+                                <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
+                                    View aggregated attendance data, trends, and statistics for the entire institution.
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
+                                <span className="text-xs text-muted-foreground">
+                                    All Classes
+                                </span>
+                                <span className="flex items-center gap-1 text-sm font-semibold text-blue-500 group-hover:translate-x-1 transition-transform">
+                                    View Report <ArrowRight className="w-4 h-4" />
+                                </span>
+                            </div>
+                        </div>
+                    </Link>
+
+                    {/* Class Cards */}
+                    {rooms.map((room) => (
+                        <Link href={`/analytics/${room._id}`} key={room._id} className="group">
+                            <div className="bg-card/40 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-sm hover:shadow-md hover:bg-card/60 transition-all h-full flex flex-col justify-between relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
+                                    <School className="w-24 h-24 transform rotate-12" />
+                                </div>
+
+                                <div>
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className="p-3 bg-indigo-500/10 rounded-2xl text-indigo-500">
+                                            <Users className="w-6 h-6" />
                                         </div>
-                                    </td>
-                                </tr>
-                            ) : records.length === 0 ? (
-                                <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
-                                        No attendance records found for this period.
-                                    </td>
-                                </tr>
-                            ) : (
-                                records.map((record) => (
-                                    <tr key={record._id} className="hover:bg-secondary/20 transition-colors">
-                                        <td className="px-6 py-4 font-medium">{record.name}</td>
-                                        <td className="px-6 py-4 text-muted-foreground">
-                                            {new Date(record.timestamp).toLocaleDateString()}
-                                        </td>
-                                        <td className="px-6 py-4 text-muted-foreground font-mono">
-                                            {new Date(record.timestamp).toLocaleTimeString()}
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                                                Present
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                                        <div>
+                                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Class Report</p>
+                                            <h3 className="text-xl font-bold leading-tight">{room.name}</h3>
+                                        </div>
+                                    </div>
+                                    {room.description && (
+                                        <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
+                                            {room.description}
+                                        </p>
+                                    )}
+                                </div>
 
-        </div >
+                                <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
+                                    <span className="text-xs text-muted-foreground">
+                                        Created {new Date(room.createdAt).toLocaleDateString()}
+                                    </span>
+                                    <span className="flex items-center gap-1 text-sm font-semibold text-indigo-500 group-hover:translate-x-1 transition-transform">
+                                        View Details <ArrowRight className="w-4 h-4" />
+                                    </span>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            )}
+        </div>
     );
 }

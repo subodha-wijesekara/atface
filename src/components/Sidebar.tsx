@@ -18,8 +18,6 @@ export default function Sidebar() {
     const navLinks = [
         { href: '/', label: 'Home', icon: LayoutDashboard },
         { href: '/rooms', label: 'My Classes', icon: Users },
-        { href: '/register', label: 'Global Register', icon: UserPlus }, // Maybe hide this later?
-        { href: '/attendance', label: 'Quick Scan', icon: ClipboardCheck },
         { href: '/analytics', label: 'Analytics', icon: BarChart3 },
         { href: '/maintenance', label: 'Maintenance', icon: Settings },
     ];

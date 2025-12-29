@@ -25,6 +25,12 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
         const { id } = await context.params;
         const body = await request.json();
 
+        console.log(`[PATCH] Updating student ${id}`, body);
+
+        if (!id) {
+            return NextResponse.json({ error: 'Student ID is required' }, { status: 400 });
+        }
+
         // Handle specific array operations if needed, but for now simple update
         // If enrolling in a new room, frontend should send the updated roomIds array 
         // OR we can handle $addToSet here. Let's assume frontend sends full update or partial for other fields.
@@ -38,11 +44,14 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
         );
 
         if (!updatedStudent) {
+            console.warn(`[PATCH] Student not found: ${id}`);
             return NextResponse.json({ error: 'Student not found' }, { status: 404 });
         }
 
+        console.log(`[PATCH] Student updated successfully: ${id}`);
         return NextResponse.json({ success: true, student: updatedStudent });
     } catch (error: any) {
+        console.error('[PATCH] Error updating student:', error);
         return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }

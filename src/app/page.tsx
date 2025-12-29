@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, ScanFace, UserCheck, ShieldCheck, Zap, UserPlus } from 'lucide-react';
+import { ArrowRight, UserCheck, ShieldCheck, Zap } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -63,41 +63,60 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Register Card (Span 5 cols) */}
-        <Link href="/register" className="glass-card group relative overflow-hidden p-5 flex flex-col justify-between lg:col-span-5 rounded-[1.5rem] border border-border/50 bg-card/60 hover:bg-card/80 transition-all shadow-lg hover:shadow-xl">
+        {/* My Classes Card (Span 5 cols) */}
+        <Link href="/rooms" className="glass-card group relative overflow-hidden p-5 flex flex-col justify-between lg:col-span-5 rounded-[1.5rem] border border-border/50 bg-card/60 hover:bg-card/80 transition-all shadow-lg hover:shadow-xl">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+          <div className="relative z-10">
+            <div className="h-9 w-9 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-3 shadow-sm ring-1 ring-indigo-500/20">
+              <UserCheck className="h-4 w-4" />
+            </div>
+            <h3 className="text-lg font-bold mb-1 tracking-tight">My Classes</h3>
+            <p className="text-muted-foreground text-sm font-medium leading-relaxed">
+              Manage your classrooms, students, and take attendance.
+            </p>
+          </div>
+
+          <div className="relative z-10 flex items-center text-indigo-600 dark:text-indigo-400 text-xs font-bold mt-3 group-hover:translate-x-1 transition-transform">
+            View Classes <ArrowRight className="ml-1 h-3 w-3" />
+          </div>
+        </Link>
+
+        {/* Analytics Card (Span 5 cols) */}
+        <Link href="/analytics" className="glass-card group relative overflow-hidden p-5 flex flex-col justify-between lg:col-span-3 rounded-[1.5rem] border border-border/50 bg-card/60 hover:bg-card/80 transition-all shadow-lg hover:shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           <div className="relative z-10">
             <div className="h-9 w-9 rounded-xl bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 shadow-sm ring-1 ring-blue-500/20">
-              <ScanFace className="h-4 w-4" />
+              <Zap className="h-4 w-4" />
             </div>
-            <h3 className="text-lg font-bold mb-1 tracking-tight">New Registration</h3>
+            <h3 className="text-lg font-bold mb-1 tracking-tight">Analytics</h3>
             <p className="text-muted-foreground text-sm font-medium leading-relaxed">
-              Add personnel to the secure database with high-resolution embedding.
+              View reports & insights.
             </p>
           </div>
 
           <div className="relative z-10 flex items-center text-blue-600 dark:text-blue-400 text-xs font-bold mt-3 group-hover:translate-x-1 transition-transform">
-            Start Enrollment <ArrowRight className="ml-1 h-3 w-3" />
+            View Reports <ArrowRight className="ml-1 h-3 w-3" />
           </div>
         </Link>
 
-        {/* Attendance Card (Span 5 cols) */}
-        <Link href="/attendance" className="glass-card group relative overflow-hidden p-5 flex flex-col justify-between lg:col-span-5 rounded-[1.5rem] border border-border/50 bg-card/60 hover:bg-card/80 transition-all shadow-lg hover:shadow-xl">
+        {/* Maintenance Card (Span 2 cols) */}
+        <Link href="/maintenance" className="glass-card group relative overflow-hidden p-5 flex flex-col justify-between lg:col-span-2 rounded-[1.5rem] border border-border/50 bg-card/60 hover:bg-card/80 transition-all shadow-lg hover:shadow-xl">
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           <div className="relative z-10">
             <div className="h-9 w-9 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3 shadow-sm ring-1 ring-emerald-500/20">
-              <Zap className="h-4 w-4" />
+              <ShieldCheck className="h-4 w-4" />
             </div>
-            <h3 className="text-lg font-bold mb-1 tracking-tight">Live Dashboard</h3>
-            <p className="text-muted-foreground text-sm font-medium leading-relaxed">
-              Real-time monitoring and instant access verification logs.
-            </p>
+            <h3 className="text-lg font-bold mb-1 tracking-tight">Maintenance</h3>
+            {/* <p className="text-muted-foreground text-sm font-medium leading-relaxed hidden xl:block">
+              Manage Data.
+            </p> */}
           </div>
 
           <div className="relative z-10 flex items-center text-emerald-600 dark:text-emerald-400 text-xs font-bold mt-3 group-hover:translate-x-1 transition-transform">
-            Launch Console <ArrowRight className="ml-1 h-3 w-3" />
+            Go <ArrowRight className="ml-1 h-3 w-3" />
           </div>
         </Link>
 
