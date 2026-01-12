@@ -3,9 +3,9 @@ import dbConnect from '@/lib/db';
 import Room from '@/models/Room';
 
 import { getServerSession } from "next-auth";
-import { handler as authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "../auth/[...nextauth]/route";
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         await dbConnect();
         const session = await getServerSession(authOptions);
@@ -14,10 +14,28 @@ export async function GET() {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        let query = {};
-        // Previously filtered by role, now fetching all for everyone
+        const { searchParams } = new URL(request.url);
+        const status = searchParams.get('status');
+        const role = (session.user as any).role;
+        const userId = (session.user as any).id;
+
+        let query: any = {};
+
+        if (role === 'admin') {
+            // Admin can filter by status, or see all
+            if (status) {
+                query.status = status;
+            }
+            // If no status specified, currently returns all (which matches Maintenance view needs)
+        } else {
+            // Teacher: see ALL their assigned classes (Active + Pending)
+            query = {
+                teacherId: userId
+            };
+        }
 
         const rooms = await Room.find(query).populate('teacherId', 'username').sort({ createdAt: -1 });
+
         return NextResponse.json(rooms);
     } catch (error: any) {
         console.error('Error fetching rooms:', error);
@@ -34,6 +52,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const role = (session.user as any).role;
         const body = await request.json();
         const { name, description, teacherId } = body;
 
@@ -41,10 +60,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Room name is required' }, { status: 400 });
         }
 
+        // Determine status and teacherId based on role
+        let roomStatus = 'active';
+        let assignedTeacherId = teacherId || null;
+
+        if (role !== 'admin') {
+            // Non-admins (Teachers) create Pending requests assigned to themselves
+            roomStatus = 'pending';
+            assignedTeacherId = (session.user as any).id;
+        }
+
         const newRoom = await Room.create({
             name,
             description,
-            teacherId: teacherId || null // Optional assignment
+            teacherId: assignedTeacherId,
+            status: roomStatus
         });
 
         return NextResponse.json({ success: true, room: newRoom });

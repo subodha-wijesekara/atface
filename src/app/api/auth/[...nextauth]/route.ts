@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
 
-const handler = NextAuth({
+export const authOptions = {
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -15,16 +15,6 @@ const handler = NextAuth({
             async authorize(credentials) {
                 if (!credentials?.username || !credentials?.password) {
                     throw new Error("Missing credentials");
-                }
-
-                // Hardcoded Admin Access
-                if (credentials.username === "admin" && credentials.password === "admin") {
-                    return {
-                        id: "admin-id",
-                        name: "Administrator",
-                        username: "admin",
-                        role: "admin",
-                    };
                 }
 
                 await dbConnect();
@@ -49,7 +39,7 @@ const handler = NextAuth({
         })
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user }: any) {
             if (user) {
                 token.role = (user as any).role;
                 token.username = (user as any).username;
@@ -57,7 +47,7 @@ const handler = NextAuth({
             }
             return token;
         },
-        async session({ session, token }) {
+        async session({ session, token }: any) {
             if (session?.user) {
                 (session.user as any).role = token.role;
                 (session.user as any).username = token.username;
@@ -70,9 +60,11 @@ const handler = NextAuth({
         signIn: '/login',
     },
     session: {
-        strategy: "jwt",
+        strategy: "jwt" as const,
     },
     secret: process.env.NEXTAUTH_SECRET || "fallback_secret_for_dev_only", // Should be in env
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

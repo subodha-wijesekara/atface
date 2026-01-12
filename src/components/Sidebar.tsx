@@ -81,8 +81,8 @@ export default function Sidebar() {
                         </div>
 
                         {session?.user ? (
-                            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-white/5 relative group">
-                                <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold uppercase">
+                            <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/30 border border-white/5 group">
+                                <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold uppercase shrink-0">
                                     {session.user.name?.[0] || 'U'}
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -91,7 +91,7 @@ export default function Sidebar() {
                                 </div>
                                 <button
                                     onClick={() => signOut({ callbackUrl: '/login' })}
-                                    className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-white/10 rounded-lg text-muted-foreground hover:text-red-400"
+                                    className="p-2 hover:bg-white/10 rounded-lg text-muted-foreground hover:text-red-400 shrink-0 transition-colors"
                                     title="Sign Out"
                                 >
                                     <LogOut className="w-4 h-4" />
