@@ -3,7 +3,7 @@ import dbConnect from '@/lib/db';
 import Room from '@/models/Room';
 
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
     try {
